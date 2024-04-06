@@ -18,13 +18,23 @@
   "content_scripts": [
     {
       "matches": [
-        "https://app.mavenlink.com/workspaces/*/tracker",
-        "https://app.mavenlink.com/workspaces/*/tracker/*",
-        "https://app.kantata.com/workspaces/*/tracker",
-        "https://app.kantata.com/workspaces/*/tracker/*"
+        "https://app.mavenlink.com/*",
+        "https://app.kantata.com/*"
       ],
       "css": ["content_scripts/kantbotha.css"],
       "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "https://app.mavenlink.com/*",
+        "https://app.kantata.com/*"
+      ],
+      "js": ["content_scripts/kantbotha.js"],
+      "run_at": "document_idle"
     }
+  ],
+  "host_permissions": [
+    "https://app.mavenlink.com/*",
+    "https://app.kantata.com/*"
   ]
 }
