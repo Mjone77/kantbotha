@@ -1,0 +1,11 @@
+[class*='table-row_styles__row--'][class*='table_styles__base-row--'] {
+  width: 100%;
+}
+
+[class*='table_styles__title-container--'], [class*='table_styles__title-header--'][class*='table_styles__padded-header--'] {
+  flex-grow: 1;
+}
+
+[class*='table_styles__table-body--'] {
+  padding-top: 0;
+}
