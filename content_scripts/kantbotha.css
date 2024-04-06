@@ -10,7 +10,7 @@
   padding-top: 0;
 }
 
-#sidebar-resize-bar {
+#sidepanel-resize-bar {
   position: absolute;
   width: 10px;
   height: 100%;
@@ -19,4 +19,13 @@
   cursor: ew-resize;
   opacity: 0;
   z-index: 9999;
+}
+
+#side-panel {
+  max-width: 90vw;
+  min-width: 400px;
+}
+
+#side-panel [class*='tracker-panel-workspace-link-wrapper-'] {
+  max-width: 75%;
 }
