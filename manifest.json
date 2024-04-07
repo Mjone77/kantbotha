@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Kantbotha",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Quality of life improvements for the Kantata/Mavenlink experience.",
   "homepage_url": "https://github.com/Mjone77/kantbotha",
   "icons": {
@@ -14,6 +14,14 @@
     "gecko": {
       "id": "kantbotha@mloney.com"
     }
+  },
+  "permissions": [
+    "scripting"
+  ],
+  "background": {
+    //"service_worker": "background/service_worker.js",
+    "scripts": ["background/service_worker.js"],
+    "type": "module"
   },
   "content_scripts": [
     {
@@ -30,11 +38,19 @@
         "https://app.kantata.com/*"
       ],
       "js": ["content_scripts/kantbotha.js"],
-      "run_at": "document_idle"
+      "run_at": "document_idle",
+      "all_frames": true
     }
   ],
   "host_permissions": [
     "https://app.mavenlink.com/*",
     "https://app.kantata.com/*"
-  ]
+  ],
+  "commands": {
+    "toggle-hide-private-messages": {
+      "suggested_key": {
+        "default": "Alt+P"
+      }
+    }
+  }
 }

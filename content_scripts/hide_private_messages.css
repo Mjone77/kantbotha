@@ -1,0 +1,3 @@
+li.private, li.event:has(>.private, >.submission) {
+  display: none;
+}
