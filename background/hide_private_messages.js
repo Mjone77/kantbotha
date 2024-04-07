@@ -2,8 +2,12 @@ if (typeof browser === 'undefined') globalThis.browser = chrome;
 
 const contentScriptId = 'hide_private_messages';
 const hosts = [
-  "https://app.mavenlink.com/*",
-  "https://app.kantata.com/*"
+  "https://app.mavenlink.com/workspaces/*",
+  "https://app.kantata.com/workspaces/*"
+];
+const excludeMatches = [
+  "https://app.mavenlink.com/workspaces/*/gantt",
+  "https://app.kantata.com/workspaces/*/gantt"
 ];
 
 async function toggleHidePrivateMessages() {
@@ -16,6 +20,7 @@ async function toggleHidePrivateMessages() {
       {
         id: contentScriptId,
         matches: hosts,
+        excludeMatches,
         css: ["content_scripts/hide_private_messages.css"],
         runAt: "document_start",
         persistAcrossSessions: false,
