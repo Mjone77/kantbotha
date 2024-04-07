@@ -1,5 +1,49 @@
 const verbose = false;
 
+/**** HIDE PRIVATE MESSAGES ****/
+
+class PrivateMessagesHider {
+  constructor(sidepanel) {
+    this.rootElement = sidepanel.querySelector('.inner-view-region');
+    this.observer = new MutationObserver(this.handleSidepanelMutation.bind(this));
+    this.observer.observe(this.rootElement, { childList: true });
+  }
+
+  async handleSidepanelMutation(mutations, observer) {
+    console.log('Handling sidepanel mutation');
+    if (this.getSidepanelToggleButton()) return;
+
+    let postListRegion = this.rootElement.querySelector('.post-list-region');
+    while (!postListRegion) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+      postListRegion = this.rootElement.querySelector('.post-list-region');
+    }
+
+    this.addToggleButton(postListRegion);
+  }
+
+  addToggleButton(postListRegion) {
+    console.log('addToggleButton');
+    if (this.getSidepanelToggleButton()) return;
+    let toggleButton = document.createElement('button');
+    toggleButton.id = 'toggle-hide-private-messages-button';
+    toggleButton.textContent = 'Hide Private Messages';
+    toggleButton.addEventListener('click', this.toggleHidePrivateMessages.bind(this));
+    postListRegion.parentElement.insertBefore(toggleButton, postListRegion);
+  }
+
+  toggleHidePrivateMessages() {
+    console.log('toggleHidePrivateMessages');
+  }
+
+  getSidepanelToggleButton() {
+    let toggleButton = this.rootElement.querySelector('#toggle-hide-private-messages-button');
+    if (toggleButton) return;
+  }
+}
+
+/**** RESIZE SIDE PANEL ****/
+
 class ResizeHelper {
   constructor(element, resizeBarElement) {
     this.element = element;
@@ -87,22 +131,28 @@ class ResizeHelper {
   }
 }
 
-console.log('kantbotha.js loaded');
-async function addResizeBarToSidepanel() {
+function addResizeBarToSidepanel(sidepanel) {
+  const resizeBar = document.createElement('div');
+  resizeBar.id = 'sidepanel-resize-bar';
+  sidepanel.insertBefore(resizeBar, sidepanel.firstElementChild);
+
+  const resizer = new ResizeHelper(sidepanel, resizeBar);
+  console.log('Added resize bar');
+}
+
+/**** INIT ****/
+
+async function watchForSidepanel() {
   let intervalId = setInterval(() => {
     const sidepanel = document.querySelector('#side-panel');
 
     if (sidepanel && sidepanel.innerHTML) {
       clearInterval(intervalId);
-      const resizeBar = document.createElement('div');
-      resizeBar.id = 'sidepanel-resize-bar';
-      sidepanel.insertBefore(resizeBar, sidepanel.firstElementChild);
-
-      const resizer = new ResizeHelper(sidepanel, resizeBar);
-      console.log('Added resize bar');
+      addResizeBarToSidepanel(sidepanel);
+      new PrivateMessagesHider(sidepanel);
     }
   }, 100);
 }
 
-addResizeBarToSidepanel();
+watchForSidepanel();
 console.log('kantbotha.js loaded');
