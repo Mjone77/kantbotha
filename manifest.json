@@ -34,7 +34,8 @@
         "https://app.kantata.com/workspaces/*/gantt"
       ],
       "css": ["content_scripts/kantbotha.css"],
-      "run_at": "document_start"
+      "run_at": "document_start",
+      "all_frames": true
     },
     {
       "matches": [
@@ -53,12 +54,5 @@
   "host_permissions": [
     "https://app.mavenlink.com/*",
     "https://app.kantata.com/*"
-  ],
-  "commands": {
-    "toggle-hide-private-messages": {
-      "suggested_key": {
-        "default": "Alt+P"
-      }
-    }
-  }
+  ]
 }

@@ -33,3 +33,32 @@
 .hide-private-messages-toggle .label::before {
   content: 'Normal';
 }
+
+.event-menus > .menu {
+  position: relative;
+}
+
+.event-menus > .menu::after {
+  background: var(--palette-neutral-light, #E1E1DD);
+  height: 1px;
+  width: 1px;
+  position: absolute;
+  left: -1px;
+  bottom: -1px;
+  content: '';
+}
+
+#side-panel .posts-main .sidepanel-activity-menu {
+  width: 100%;
+  background-color: var(--palette-neutral-xx-light, #FBFAF6);
+  height: 23px;
+  border-top: 1px solid var(--palette-neutral-mid-light, #C8C8C8);
+  border-bottom: 1px solid var(--palette-neutral-mid-light, #C8C8C8);
+  margin-top: -.5rem;
+  margin-bottom: 1rem;
+}
+
+.sidepanel-activity-menu .menu {
+  float: right;
+  border-left: 1px solid var(--palette-neutral-light);
+}

@@ -18,8 +18,21 @@ class PrivateMessagesHiderSidepanel {
   }
 
   async handleSidepanelMutation(mutations, observer) {
+    if (this.inHandleSidepanelMutation) return;
+
     console.log('Handling sidepanel mutation');
-    if (this.getSidepanelToggleButton()) return;
+    let hasAddedNodes = false;
+    for (const mutation of mutations) {
+      if (mutation.addedNodes.length) {
+        hasAddedNodes = true;
+        break;
+      }
+    }
+    if (!hasAddedNodes) return; // Side panel was probably removed
+
+    if (this.querySidepanelToggleButton()) return; // Already added
+
+    this.inHandleSidepanelMutation = true;
 
     let postListRegion = this.rootElement.querySelector('.post-list-region');
     while (!postListRegion) {
@@ -28,25 +41,38 @@ class PrivateMessagesHiderSidepanel {
     }
 
     this.addToggleButton(postListRegion);
+    this.inHandleSidepanelMutation = false;
   }
 
   addToggleButton(postListRegion) {
     console.log('addToggleButton');
-    if (this.getSidepanelToggleButton()) return;
-    let toggleButton = document.createElement('button');
-    toggleButton.id = 'toggle-hide-private-messages-button';
-    toggleButton.textContent = 'Hide Private Messages';
-    toggleButton.addEventListener('click', this.toggleHidePrivateMessages.bind(this));
-    postListRegion.parentElement.insertBefore(toggleButton, postListRegion);
+    if (this.querySidepanelToggleButton()) return;
+    console.log('addToggleButton 2');
+    postListRegion.parentElement.insertBefore(this.getSidepanelActivityMenu(), postListRegion);
+    console.log('addToggleButton 3');
   }
 
-  toggleHidePrivateMessages() {
-    console.log('toggleHidePrivateMessages');
+  querySidepanelToggleButton() {
+    let toggleButton = this.rootElement.querySelector('.hide-private-messages-toggle');
+    return toggleButton;
   }
 
-  getSidepanelToggleButton() {
-    let toggleButton = this.rootElement.querySelector('#toggle-hide-private-messages-button');
-    if (toggleButton) return;
+  getSidepanelActivityMenu() {
+    if (this.sidePanelActivityMenuElement) return this.sidePanelActivityMenuElement;
+
+    // Copy the event menu from the Activity Feed with only the toggle button
+    let activityMenu = document.querySelector('.event-menus');
+    if (!activityMenu) throw 'Could not find activity menu to copy';
+    let toggleButton = activityMenu.querySelector('.hide-private-messages-toggle').cloneNode(true);
+    if (!toggleButton) throw 'Could not find toggle button to copy';
+
+    this.sidePanelActivityMenuElement = activityMenu.cloneNode(false);
+    this.sidePanelActivityMenuElement.classList.add('sidepanel-activity-menu');
+    let clonedToggleButton = toggleButton.cloneNode(true);
+    clonedToggleButton.addEventListener('click', toggleHidePrivateMessages);
+    this.sidePanelActivityMenuElement.appendChild(clonedToggleButton);
+
+    return this.sidePanelActivityMenuElement;
   }
 }
 
@@ -65,6 +91,7 @@ function createPrivateMessageToggleActivityFeed() {
     </div>
   `;
   toggle.addEventListener('click', toggleHidePrivateMessages);
+
   try {
     rootElement.insertBefore(toggle, rootElement.firstElementChild);
   } catch (e) {
@@ -181,8 +208,11 @@ async function watchForSidepanel() {
     if (sidepanel && sidepanel.innerHTML) {
       clearInterval(intervalId);
       addResizeBarToSidepanel(sidepanel);
+      console.log('pmhaf -1');
       createPrivateMessageToggleActivityFeed();
+      console.log('pmhaf 0');
       new PrivateMessagesHiderSidepanel(sidepanel);
+      console.log('pmhaf 1');
     }
   }, 100);
 }

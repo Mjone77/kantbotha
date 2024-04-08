@@ -60,11 +60,12 @@ async function injectCss(hidden) {
   return true;
 }
 
+/* Removed the toggle_hide_private_messages command in favor of a button
 browser.commands.onCommand.addListener((command) => {
-  if (command === 'toggle-hide-private-messages') {
+  if (command === 'toggle_hide_private_messages') {
     toggleHidePrivateMessages();
   }
-});
+});*/
 
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === 'toggle_hide_private_messages') {

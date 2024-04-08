@@ -4,6 +4,7 @@ li.private, li.event:has(>.private, >.submission) {
 
 .hide-private-messages-toggle {
   background: #404040;
+  border-bottom: 1px solid #404040;
 }
 
 .hide-private-messages-toggle > .header-dropdown-container {
