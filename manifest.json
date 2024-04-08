@@ -19,7 +19,6 @@
     "scripting"
   ],
   "background": {
-    //"service_worker": "background/service_worker.js",
     "scripts": ["background/service_worker.js"],
     "type": "module"
   },
@@ -52,7 +51,7 @@
     }
   ],
   "host_permissions": [
-    "https://app.mavenlink.com/*",
-    "https://app.kantata.com/*"
+    "*://app.mavenlink.com/*",
+    "*://app.kantata.com/*"
   ]
 }
