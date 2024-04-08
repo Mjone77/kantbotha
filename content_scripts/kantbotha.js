@@ -1,7 +1,6 @@
 if (typeof browser === 'undefined') globalThis.browser = chrome;
 
 const verbose = false;
-console.log('pmhaf -3');
 /**** HIDE PRIVATE MESSAGES ****/
 
 async function toggleHidePrivateMessages() {
@@ -20,7 +19,7 @@ class PrivateMessagesHiderSidepanel {
   async handleSidepanelMutation(mutations, observer) {
     if (this.inHandleSidepanelMutation) return;
 
-    console.log('Handling sidepanel mutation');
+    if (verbose) console.log('Handling sidepanel mutation');
     let hasAddedNodes = false;
     for (const mutation of mutations) {
       if (mutation.addedNodes.length) {
@@ -45,11 +44,9 @@ class PrivateMessagesHiderSidepanel {
   }
 
   addToggleButton(postListRegion) {
-    console.log('addToggleButton');
+    if (verbose) console.log('addToggleButton');
     if (this.querySidepanelToggleButton()) return;
-    console.log('addToggleButton 2');
     postListRegion.parentElement.insertBefore(this.getSidepanelActivityMenu(), postListRegion);
-    console.log('addToggleButton 3');
   }
 
   querySidepanelToggleButton() {
@@ -95,7 +92,7 @@ function createPrivateMessageToggleActivityFeed() {
   try {
     rootElement.insertBefore(toggle, rootElement.firstElementChild);
   } catch (e) {
-    console.error('pmhaf', e);
+    console.error('createPrivateMessageToggleActivityFeed', e);
   }
 }
 
@@ -194,28 +191,23 @@ function addResizeBarToSidepanel(sidepanel) {
   sidepanel.insertBefore(resizeBar, sidepanel.firstElementChild);
 
   const resizer = new ResizeHelper(sidepanel, resizeBar);
-  console.log('Added resize bar');
+  if (verbose) console.log('Added resize bar');
 }
 
 /**** INIT ****/
 
 async function watchForSidepanel() {
-  
-  console.log('pmhaf -2');
   let intervalId = setInterval(() => {
     const sidepanel = document.querySelector('#side-panel');
 
     if (sidepanel && sidepanel.innerHTML) {
       clearInterval(intervalId);
       addResizeBarToSidepanel(sidepanel);
-      console.log('pmhaf -1');
       createPrivateMessageToggleActivityFeed();
-      console.log('pmhaf 0');
       new PrivateMessagesHiderSidepanel(sidepanel);
-      console.log('pmhaf 1');
     }
   }, 100);
 }
 
 watchForSidepanel();
-console.log('kantbotha.js loaded');
+if (verbose) console.log('kantbotha.js loaded');

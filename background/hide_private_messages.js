@@ -11,7 +11,6 @@ const excludeMatches = [
 ];
 
 async function toggleHidePrivateMessages() {
-  console.log('Toggling hide private messages');
   let hidden = (await browser.scripting.getRegisteredContentScripts({ ids: [contentScriptId] })).length > 0;
   if (hidden) {
     await browser.scripting.unregisterContentScripts({ ids: [contentScriptId] });
