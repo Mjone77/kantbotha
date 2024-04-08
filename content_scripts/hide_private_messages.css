@@ -1,3 +1,20 @@
 li.private, li.event:has(>.private, >.submission) {
   display: none;
 }
+
+.hide-private-messages-toggle {
+  background: #404040;
+}
+
+.hide-private-messages-toggle > .header-dropdown-container {
+  color: var(--palette-neutral-light, #E1E1DD);
+}
+
+.hide-private-messages-toggle > .header-dropdown-container > .dropdown-display {
+  color: var(--palette-action-base, #33AE10);
+  content: 'Private';
+}
+
+.hide-private-messages-toggle .label::before {
+  content: 'Public' !important;
+}

@@ -65,3 +65,11 @@ browser.commands.onCommand.addListener((command) => {
     toggleHidePrivateMessages();
   }
 });
+
+browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === 'toggle_hide_private_messages') {
+    toggleHidePrivateMessages().then(hidden => { sendResponse(hidden); });
+    return true;
+  }
+  return false;
+});

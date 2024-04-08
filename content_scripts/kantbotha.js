@@ -1,8 +1,16 @@
-const verbose = false;
+if (typeof browser === 'undefined') globalThis.browser = chrome;
 
+const verbose = false;
+console.log('pmhaf -3');
 /**** HIDE PRIVATE MESSAGES ****/
 
-class PrivateMessagesHider {
+async function toggleHidePrivateMessages() {
+  return browser.runtime.sendMessage({
+    action: 'toggle_hide_private_messages'
+  });
+}
+
+class PrivateMessagesHiderSidepanel {
   constructor(sidepanel) {
     this.rootElement = sidepanel.querySelector('.inner-view-region');
     this.observer = new MutationObserver(this.handleSidepanelMutation.bind(this));
@@ -39,6 +47,28 @@ class PrivateMessagesHider {
   getSidepanelToggleButton() {
     let toggleButton = this.rootElement.querySelector('#toggle-hide-private-messages-button');
     if (toggleButton) return;
+  }
+}
+
+function createPrivateMessageToggleActivityFeed() {
+  let rootElement = document.querySelector('.event-menus');
+  if (!rootElement) return;
+
+  let toggle = document.createElement('div');
+  toggle.classList.add('menu','hide-private-messages-toggle');
+  toggle.innerHTML = `
+    <div class="${rootElement.querySelector('.header-dropdown-container').className}">
+      MODE:
+      <div class="${rootElement.querySelector('.dropdown-display').className}">
+        <div class="label"></div>
+      </div>
+    </div>
+  `;
+  toggle.addEventListener('click', toggleHidePrivateMessages);
+  try {
+    rootElement.insertBefore(toggle, rootElement.firstElementChild);
+  } catch (e) {
+    console.error('pmhaf', e);
   }
 }
 
@@ -143,13 +173,16 @@ function addResizeBarToSidepanel(sidepanel) {
 /**** INIT ****/
 
 async function watchForSidepanel() {
+  
+  console.log('pmhaf -2');
   let intervalId = setInterval(() => {
     const sidepanel = document.querySelector('#side-panel');
 
     if (sidepanel && sidepanel.innerHTML) {
       clearInterval(intervalId);
       addResizeBarToSidepanel(sidepanel);
-      new PrivateMessagesHider(sidepanel);
+      createPrivateMessageToggleActivityFeed();
+      new PrivateMessagesHiderSidepanel(sidepanel);
     }
   }, 100);
 }

@@ -29,3 +29,7 @@
 #side-panel [class*='tracker-panel-workspace-link-wrapper-'] {
   max-width: 75%;
 }
+
+.hide-private-messages-toggle .label::before {
+  content: 'Normal';
+}
