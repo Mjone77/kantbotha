@@ -62,3 +62,8 @@
   float: right;
   border-left: 1px solid var(--palette-neutral-light);
 }
+
+.task-tracker-region [class*='table-row_styles__row--']:hover > :not([class*='drag-and-drop-handle_styles__drag-and-drop-container--'], [class*='table_styles__spacer-span--']) {
+  transition: none;
+  background: var(--mds-grey-4, #F7F7F7);
+}
