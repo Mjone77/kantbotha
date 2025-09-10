@@ -25,12 +25,10 @@
   "content_scripts": [
     {
       "matches": [
-        "https://app.mavenlink.com/workspaces/*",
-        "https://app.kantata.com/workspaces/*"
+        "https://*.mavenlink.com/workspaces/*"
       ],
       "exclude_matches": [
-        "https://app.mavenlink.com/workspaces/*/gantt",
-        "https://app.kantata.com/workspaces/*/gantt"
+        "https://*.mavenlink.com/workspaces/*/gantt"
       ],
       "css": ["content_scripts/kantbotha.css"],
       "run_at": "document_start",
@@ -38,12 +36,10 @@
     },
     {
       "matches": [
-        "https://app.mavenlink.com/workspaces/*",
-        "https://app.kantata.com/workspaces/*"
+        "https://*.mavenlink.com/workspaces/*"
       ],
       "exclude_matches": [
-        "https://app.mavenlink.com/workspaces/*/gantt",
-        "https://app.kantata.com/workspaces/*/gantt"
+        "https://*.mavenlink.com/workspaces/*/gantt"
       ],
       "js": ["content_scripts/kantbotha.js"],
       "run_at": "document_idle",
@@ -51,7 +47,6 @@
     }
   ],
   "host_permissions": [
-    "*://app.mavenlink.com/*",
-    "*://app.kantata.com/*"
+    "*://*.mavenlink.com/*"
   ]
 }
