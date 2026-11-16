@@ -1,12 +1,32 @@
-.task-tracker-region [class*='table-row_styles__row--'][class*='table_styles__base-row--'] {
+/* Task tracker: let the Title column fill the page width.
+   Kantata's CSS-module class names look like "table_styles__title-container--XfpRH" (older)
+   or "table_styles-module__title-container--XfpRH" (current), so match the module name and
+   the "__<class>--" part separately to work with both. */
+
+/* Rows fill the table width... */
+.task-tracker-region [class*='table-row_styles'][class*='__row--'][class*='__base-row--'] {
   width: 100%;
 }
 
-.task-tracker-region [class*='table_styles__title-container--'], [class*='table_styles__title-header--'][class*='table_styles__padded-header--'] {
+/* ...measured against the rows' own container. Rows are absolutely positioned, so without
+   this they'd size against the table body including its right padding and end 32px past
+   the header, pushing every column after Title out of line. */
+.task-tracker-region [class*='table_styles'][class*='__table-body--'] > div {
+  position: relative;
+}
+
+/* The header row fills the header the same way. */
+.task-tracker-region [class*='table_styles'][class*='__header-row--'] {
   flex-grow: 1;
 }
 
-.task-tracker-region [class*='table_styles__table-body--'] {
+/* The Title cell and Title header take up the extra space. */
+.task-tracker-region [class*='table_styles'][class*='__title-container--'],
+.task-tracker-region [class*='table_styles'][class*='__title-header--'][class*='__padded-header--'] {
+  flex-grow: 1;
+}
+
+.task-tracker-region [class*='table_styles'][class*='__table-body--'] {
   padding-top: 0;
 }
 
@@ -63,7 +83,7 @@
   border-left: 1px solid var(--palette-neutral-light);
 }
 
-.task-tracker-region [class*='table-row_styles__row--']:hover > :not([class*='drag-and-drop-handle_styles__drag-and-drop-container--'], [class*='table_styles__spacer-span--']) {
+.task-tracker-region [class*='table-row_styles'][class*='__row--']:hover > :not([class*='drag-and-drop-handle_styles'][class*='__drag-and-drop-container--'], [class*='table_styles'][class*='__spacer-span--']) {
   transition: none;
   background: var(--mds-grey-4, #F7F7F7);
 }

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Kantbotha · Organization settings</title>
+    <link rel="icon" href="../icons/icon_48.png" />
+    <link rel="stylesheet" href="app.css" />
+  </head>
+  <body>
+    <div class="app-bar">
+      <img src="../icons/icon_48.png" alt="" />
+      <span class="brand">Kantbotha</span>
+      <span class="divider">|</span>
+      <span class="app-name">Organization settings</span>
+    </div>
+
+    <header class="page-header">
+      <h1>Organization settings</h1>
+      <p class="sub">Used by the Timesheet Copier. Set these once; they're saved in this browser only.</p>
+    </header>
+
+    <main>
+      <form id="org-form" class="panel" novalidate>
+        <h2>Kantata and Workday</h2>
+        <div class="panel-body">
+          <div class="org-fields">
+            <div class="field">
+              <label for="kantata-url">Kantata URL</label>
+              <input id="kantata-url" type="text" autocomplete="off" spellcheck="false" placeholder="https://yourcompany.mavenlink.com" />
+              <span class="help">The address you use for Kantata. Must be a <code>*.mavenlink.com</code> address.</span>
+            </div>
+
+            <div class="field">
+              <label for="workday-tenant">Workday tenant</label>
+              <input id="workday-tenant" type="text" autocomplete="off" spellcheck="false" placeholder="yourcompany" />
+              <span class="help">The name after <code>wd5.myworkday.com/</code> in your Workday address. You can paste the whole Workday URL.</span>
+            </div>
+
+            <div class="field">
+              <label for="admin-project">Admin project (Workday)</label>
+              <input id="admin-project" type="text" autocomplete="off" spellcheck="false" />
+              <span class="help">The exact Workday project name that Kantata "Admin Project" time is copied to (its General &gt; General task).</span>
+            </div>
+          </div>
+
+          <div class="toolbar">
+            <button id="save" type="submit" class="primary">Save</button>
+          </div>
+          <p id="save-status" class="status" data-state="idle" hidden></p>
+        </div>
+      </form>
+    </main>
+
+    <script type="module" src="options.js"></script>
+  </body>
+</html>

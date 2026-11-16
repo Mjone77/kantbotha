@@ -1,0 +1,7 @@
+{
+  "name": "kantbotha",
+  "private": true,
+  "devDependencies": {
+    "@types/chrome": "^0.3.7"
+  }
+}

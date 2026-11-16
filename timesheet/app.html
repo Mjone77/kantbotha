@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Kantbotha · Timesheet Copier</title>
+    <link rel="icon" href="../icons/icon_48.png" />
+    <link rel="stylesheet" href="app.css" />
+  </head>
+  <body>
+    <div class="app-bar">
+      <img src="../icons/icon_48.png" alt="" />
+      <span class="brand">Kantbotha</span>
+      <span class="divider">|</span>
+      <span class="app-name">Timesheet Copier</span>
+      <button id="open-options" type="button" class="app-bar-button">Organization settings</button>
+    </div>
+
+    <header class="page-header">
+      <h1>Copy Kantata time to Workday</h1>
+      <p class="sub">Copies a week of Kantata time into the Workday timesheet. <strong>Never submits anything.</strong></p>
+    </header>
+
+    <main>
+      <div id="org-banner" class="setup-banner" hidden>
+        <div>
+          <strong>Finish setting up the copier.</strong>
+          Set these in Organization settings before loading a timesheet: <span id="org-missing"></span>.
+        </div>
+        <button id="org-setup" type="button" class="primary">Open Organization settings</button>
+      </div>
+
+      <section class="panel" id="settings">
+        <h2>Settings</h2>
+        <div class="panel-body">
+          <div class="fields">
+            <div class="field">
+              <label for="role">Role (Workday task)</label>
+              <select id="role">
+                <option value="" selected>Select a role</option>
+                <option>Director</option>
+                <option>Project Lead</option>
+                <option>Project Manager</option>
+                <option>Engineer</option>
+                <option>QA Analyst</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="location">Location worktag</label>
+              <input id="location" type="text" placeholder="Location: &lt;your location worktag&gt; (blank = Workday default)" />
+            </div>
+
+            <div class="field">
+              <label for="week">Week (any day in it)</label>
+              <input id="week" type="date" />
+              <span id="week-label" class="help"></span>
+            </div>
+          </div>
+          <p class="hint">
+            Have Kantata and Workday open and logged in (any page). Missing tabs are opened automatically.
+            While it runs, keep the Edge window with Workday visible (not minimized or fully covered):
+            browsers pause rendering in hidden windows and Workday stops updating.
+          </p>
+
+          <div class="toolbar">
+            <button id="preview" type="button" class="secondary">Load Timesheet</button>
+            <button id="apply" type="button" class="primary" disabled title="Run a preview first">Copy to Workday</button>
+            <button id="stop" type="button" class="subtle" disabled>Stop</button>
+          </div>
+          <p id="status" class="status" data-state="idle">Idle.</p>
+        </div>
+      </section>
+
+      <section class="panel" id="report-card" hidden>
+        <h2>Report</h2>
+        <div class="panel-body">
+          <div id="report-summary"></div>
+          <h3>Flags</h3>
+          <ul id="flags"></ul>
+          <h3>Entries</h3>
+          <div class="table-wrap">
+            <table id="entries">
+              <thead>
+                <tr><th>Day</th><th>Workday row</th><th>Hours</th><th>Status</th><th>Comment</th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Log</h2>
+        <div class="panel-body">
+          <pre id="log"></pre>
+        </div>
+      </section>
+    </main>
+
+    <pre id="report-json" hidden></pre>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>

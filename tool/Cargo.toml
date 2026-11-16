@@ -1,0 +1,17 @@
+[package]
+name = "extool"
+version = "0.1.0"
+edition = "2021"
+description = "Build and maintenance tool for the Kantbotha extension"
+publish = false
+
+[dependencies]
+serde_json = { version = "1", features = ["preserve_order"] }
+sha2 = "0.10"
+base64 = "0.22"
+rsa = "0.9"
+rand = "0.8"
+zip = { version = "2", default-features = false, features = ["deflate"] }
+
+[profile.release]
+opt-level = 2

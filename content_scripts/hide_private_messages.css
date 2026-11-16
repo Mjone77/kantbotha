@@ -1,4 +1,4 @@
-li.private, li.event:has(>.private, >.submission) {
+li.private, li.event:has(>.private, >.submission), .post-list li.post.private {
   display: none;
 }
 

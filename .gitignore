@@ -1,2 +1,6 @@
 /releases
 /.vscode
+/dist/
+/node_modules/
+/tool/target/
+/manifest_key.txt
