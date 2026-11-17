@@ -65,14 +65,24 @@ export async function wdScanGrid(): Promise<GridScan> {
   const candidates = Array.from(document.querySelectorAll("div")).filter(
     (d) => scrollable(d) && !!d.querySelector("[role=row][aria-rowindex] [role=gridcell]"),
   );
-  const scroller = candidates.find((c) => !candidates.some((o) => o !== c && c.contains(o)));
-  if (!scroller) return { ok: false, error: "Timesheet grid not found.", header, rows: [], summary: {} };
+  const scroller = candidates.find((c) => !candidates.some((o) => o !== c && c.contains(o))) ?? null;
+  // No scroller: either the timesheet is blank (the grid has only its header rows) or every
+  // row fits without scrolling. Both are fine as long as the grid itself is there.
+  if (!scroller) {
+    const grid = Array.from(document.querySelectorAll("[role=treegrid],[role=grid]")).find(
+      (g) => !g.closest("[role=dialog]") && /Time Types/.test(txt(g)),
+    );
+    if (!grid) return { ok: false, error: "Timesheet grid not found.", header, rows: [], summary: {} };
+  }
   // The grid has a separate custom scrollbar with the same scroll height that drives the
   // virtualized rendering, so move it together with the grid body.
-  const linked = Array.from(document.querySelectorAll("div")).filter(
-    (d) => d !== scroller && scrollable(d) && d.scrollHeight === scroller.scrollHeight && d.clientHeight === scroller.clientHeight,
-  );
+  const linked = scroller
+    ? Array.from(document.querySelectorAll("div")).filter(
+        (d) => d !== scroller && scrollable(d) && d.scrollHeight === scroller.scrollHeight && d.clientHeight === scroller.clientHeight,
+      )
+    : [];
   const setTop = (v: number) => {
+    if (!scroller) return;
     scroller.scrollTop = v;
     for (const l of linked) {
       l.scrollTop = v;
@@ -101,21 +111,28 @@ export async function wdScanGrid(): Promise<GridScan> {
       rows.set(idx, cur);
     }
   };
-  const original = scroller.scrollTop;
-  setTop(0);
-  await sleep(500);
-  for (let i = 0; i < 40; i++) {
-    collect();
-    const before = scroller.scrollTop;
-    setTop(before + Math.max(100, Math.floor(scroller.clientHeight * 0.5)));
+  if (scroller) {
+    const original = scroller.scrollTop;
+    setTop(0);
     await sleep(500);
+    for (let i = 0; i < 40; i++) {
+      collect();
+      const before = scroller.scrollTop;
+      setTop(before + Math.max(100, Math.floor(scroller.clientHeight * 0.5)));
+      await sleep(500);
+      collect();
+      // scrollTop can be fractional, so compare with a tolerance.
+      if (Math.abs(scroller.scrollTop - before) < 1) break;
+    }
+    await sleep(300);
     collect();
-    // scrollTop can be fractional, so compare with a tolerance.
-    if (Math.abs(scroller.scrollTop - before) < 1) break;
+    setTop(original);
+    // Let the grid re-render at the restored position, so the next step doesn't find rows
+    // left over from the bottom of the grid.
+    await sleep(500);
+  } else {
+    collect();
   }
-  await sleep(300);
-  collect();
-  setTop(original);
 
   const summary: Record<string, number> = {};
   for (const t of Array.from(document.querySelectorAll("table"))) {
@@ -261,6 +278,17 @@ export async function wdAct(spec: MarkSpec, action: Action): Promise<ActResult> 
           el = find();
           if (Math.abs(sc.scrollTop - before) < 1) break;
         }
+      }
+      // The grid renders rows asynchronously after a scroll, so the button found may be a
+      // leftover from an earlier scroll position that the grid is about to remove. Scroll
+      // it into view, let the grid re-render, and find it again until it's really there.
+      for (let i = 0; i < 6 && el; i++) {
+        el.scrollIntoView({ block: "center", inline: "nearest" });
+        await sleep(300);
+        const again = find();
+        const size = again ? again.getBoundingClientRect() : null;
+        if (again && size && size.width > 0 && size.height > 0 && again === el) break;
+        el = again;
       }
       break;
     }

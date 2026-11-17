@@ -59,7 +59,8 @@ Workday in `about:addons` → Kantbotha → Permissions.
    Workday and goes to the timesheet itself.
 2. Click the Kantbotha toolbar icon. The copier opens in its own small window.
 3. The first time, click **Open Organization settings** (or **Organization settings** in
-   the copier's top bar, or the extension's Options) and set:
+   the copier's top bar). The settings open in the copier's window, and **← Back to
+   Timesheet Copier** returns to it. (They're also the extension's Options page.) Set:
    - **Kantata URL**: your `https://<name>.mavenlink.com` address.
    - **Workday tenant**: the name after `wd5.myworkday.com/` in your Workday address (you
      can paste the whole URL).

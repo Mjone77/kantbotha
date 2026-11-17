@@ -10,6 +10,9 @@ export class StopError extends Error {
 }
 
 export class Driver {
+  /** Set while closing panels after a stop or error; those steps must run even after Stop. */
+  private cleaningUp = false;
+
   constructor(
     readonly tabId: number,
     private readonly shouldStop: () => boolean,
@@ -35,7 +38,12 @@ export class Driver {
   }
 
   checkStop(): void {
-    if (this.shouldStop()) throw new StopError();
+    if (!this.cleaningUp && this.shouldStop()) throw new StopError();
+  }
+
+  /** Lets page functions run again after Stop, so the run can close the panels it opened. */
+  beginCleanup(): void {
+    this.cleaningUp = true;
   }
 }
 

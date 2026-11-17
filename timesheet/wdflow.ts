@@ -11,6 +11,12 @@ import type { Action, DialogEntry, DialogRead, GridScan, MarkSpec, SearchRead, T
 export type Log = (msg: string) => void;
 
 export class Workday {
+  /**
+   * The panel that was clicked open but hasn't been seen open yet. A panel can take a few
+   * seconds to appear, so cleanup after a stop in that gap has to wait for it.
+   */
+  private opening: "details" | "search" | null = null;
+
   constructor(
     private readonly d: Driver,
     private readonly log: Log,
@@ -85,7 +91,7 @@ export class Workday {
       }
       if ((await poll(() => this.state(), (s) => s.visible, { timeout: 2000, interval: 300 })).ok) return;
     }
-    this.log("Waiting for the Workday window to be visible. Bring the Edge window with Workday to the front (not minimized or covered).");
+    this.log("Waiting for the Workday window to be visible. Bring the browser window with Workday to the front (not minimized or covered).");
     const r = await poll(() => this.state(), (s) => s.visible, { timeout: 10 * 60000, interval: 1000, check: () => this.d.checkStop() });
     if (!r.ok) throw new Error("The Workday tab stayed hidden for 10 minutes.");
     this.log("Workday is visible again; continuing.");
@@ -151,9 +157,11 @@ export class Workday {
   async addRowViaSearch(target: Target): Promise<string | null> {
     const keyword = target.code; // p-code, or the admin project name
     this.log(`Adding the Workday row for ${target.label} (Expand Search "${keyword}").`);
+    this.opening = "search";
     await this.click({ kind: "pageButton", text: "Expand Search" }, "Expand Search");
     const opened = await poll(() => this.readSearch(), (s) => s.open, { timeout: 20000, interval: 500 });
     if (!opened.ok) return "The Search across projects panel didn't open.";
+    this.opening = null;
     await poll(() => this.exists({ kind: "searchKeywords" }), (v) => v, { timeout: 10000, interval: 400 });
     await this.act({ kind: "searchKeywords" }, { type: "fill", value: keyword }, "Fill Keywords");
     await this.click({ kind: "searchButton" }, "Search");
@@ -221,9 +229,11 @@ export class Workday {
   // -------------------------------------------------------------- details sidebar
 
   async openDetails(row: LeafRow, target: Target): Promise<DialogRead> {
+    this.opening = "details";
     await this.click({ kind: "pencil", rowIndex: row.rowIndex }, `Open details for ${target.label}`);
     const r = await poll(() => this.readDialog(), (d) => d.open && d.days.length > 0, { timeout: 20000, interval: 500 });
     if (!r.ok) throw new Error(`The Details sidebar for ${target.label} didn't open.`);
+    this.opening = null;
     const dlg = await this.readDialogSettled();
     // Time Type reads "<project> > <phase> > <task>"; the p-code (or admin project) must be in it.
     if (!dlg.timeType.includes(target.code)) {
@@ -231,6 +241,25 @@ export class Workday {
       throw new Error(`The Details sidebar shows "${dlg.timeType}", not ${target.label}.`);
     }
     return dlg;
+  }
+
+  /**
+   * After a stop or error: closes the search panel and the Details sidebar (discarding only
+   * unsaved changes), including one that was clicked open just before and is still loading.
+   * Runs even though Stop was pressed.
+   */
+  async cleanup(): Promise<void> {
+    this.d.beginCleanup();
+    const opening = this.opening;
+    this.opening = null;
+    if (opening === "search") await poll(() => this.readSearch(), (s) => s.open, { timeout: 20000, interval: 500 });
+    if (opening === "details") await poll(() => this.readDialog(), (d) => d.open && d.days.length > 0, { timeout: 20000, interval: 500 });
+    if ((await this.readSearch()).open) await this.closeSearch();
+    if ((await this.readDialog()).open) {
+      // Cancel only works once the sidebar has finished loading.
+      await poll(() => this.readDialog(), (d) => !d.open || d.days.length > 0, { timeout: 20000, interval: 500 });
+      await this.cancelDetails();
+    }
   }
 
   /** Closes the sidebar without saving (discarding only unsaved changes made in it). */

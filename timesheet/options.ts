@@ -44,8 +44,11 @@ form.addEventListener("submit", (e) => {
     kantataEl.value = kantataUrl;
     tenantEl.value = workdayTenant;
     adminEl.value = adminProject;
-    setStatus("Saved. You can close this tab.", "done");
+    setStatus("Saved.", "done");
   });
 });
+
+// The copier opens this page in its own window; Back returns there.
+$("back").addEventListener("click", () => location.assign("app.html"));
 
 void load();

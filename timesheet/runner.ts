@@ -208,8 +208,7 @@ export async function run(settings: Settings, mode: "preview" | "apply", hooks: 
     flag("error", "Stopped: " + report.aborted);
     if (wd) {
       try {
-        if ((await wd.readSearch()).open) await wd.closeSearch();
-        if ((await wd.readDialog()).open) await wd.cancelDetails();
+        await wd.cleanup();
       } catch {
         flag("warn", "A Workday panel may still be open. Close it with Cancel → Discard (that only discards unsaved changes).");
       }

@@ -19,6 +19,7 @@ const logEl = $<HTMLPreElement>("log");
 const orgBanner = $<HTMLDivElement>("org-banner");
 const orgMissing = $<HTMLSpanElement>("org-missing");
 
+const WEEK_KEY = "kantbotha.week";
 let running = false;
 let stopRequested = false;
 /** Settings of the last successful preview; Copy is only enabled for the same settings. */
@@ -44,8 +45,11 @@ async function loadSettings(): Promise<void> {
   const today = toIso(new Date(Date.now() - new Date().getTimezoneOffset() * 60000));
   roleEl.value = stored?.role ?? "";
   locationEl.value = stored?.location ?? "";
-  // The week always starts on today's date; only role and location are remembered.
-  weekEl.value = today;
+  // The week starts on today's date (only role and location are remembered), except when
+  // coming back from Organization settings in the same window.
+  const kept = sessionStorage.getItem(WEEK_KEY);
+  sessionStorage.removeItem(WEEK_KEY);
+  weekEl.value = kept && parseIso(kept) ? kept : today;
 }
 
 function saveSettings(): void {
@@ -74,6 +78,12 @@ function syncButtons(): void {
   previewBtn.disabled = running || !orgReady;
   previewBtn.title = orgReady ? "" : "Finish Organization settings first";
   stopBtn.disabled = !running;
+  // Leaving the page would end a run, so settings wait until it's finished.
+  for (const id of ["open-options", "org-setup"]) {
+    const b = $<HTMLButtonElement>(id);
+    b.disabled = running;
+    b.title = running ? "Available when the run finishes" : "";
+  }
   const ok = orgReady && previewedFor !== null && previewedFor === JSON.stringify(currentSettings());
   applyBtn.disabled = running || !ok;
   applyBtn.title = ok ? "" : orgReady ? "Run a preview with these settings first" : "Finish Organization settings first";
@@ -161,7 +171,14 @@ stopBtn.addEventListener("click", () => {
 window.addEventListener("beforeunload", (e) => {
   if (running) e.preventDefault();
 });
-for (const id of ["open-options", "org-setup"]) $(id).addEventListener("click", () => void chrome.runtime.openOptionsPage());
+// Organization settings open in this window; its Back button returns here. Keep the chosen
+// week for this window's session so it survives the round trip.
+for (const id of ["open-options", "org-setup"])
+  $(id).addEventListener("click", () => {
+    if (running) return;
+    sessionStorage.setItem(WEEK_KEY, weekEl.value);
+    location.assign("options.html");
+  });
 // Pick up Organization settings as soon as they're saved on the options page.
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area !== "local" || !(ORG_KEY in changes)) return;
